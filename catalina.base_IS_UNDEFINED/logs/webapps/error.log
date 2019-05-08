@@ -1,0 +1,9 @@
+2019-05-05 16:32:59.109 [main] ERROR com.real.o2o.service.impl.LocalAuthServiceImpl - modifyLocalAuth error:ÃÜÂë¸üÐÂÊ§°Ü
+2019-05-05 16:32:59.405 [main] ERROR com.real.o2o.service.impl.WechatAuthServiceImpl - insertWechatAuth error:
+### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'qdasdfqfq' for key 'unique_open_id'
+### The error may exist in file [C:\Users\84428\IdeaProjects\springboot-o2o\target\classes\mapper\WechatAuthMapper.xml]
+### The error may involve com.real.o2o.dao.WechatAuthDao.insertWechatAuth-Inline
+### The error occurred while setting parameters
+### SQL: insert into         tb_wechat_auth(user_id,open_id,create_time)         values (?,?,?)
+### Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'qdasdfqfq' for key 'unique_open_id'
+; Duplicate entry 'qdasdfqfq' for key 'unique_open_id'; nested exception is java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'qdasdfqfq' for key 'unique_open_id'
