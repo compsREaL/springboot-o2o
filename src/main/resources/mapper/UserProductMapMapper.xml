@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.real.o2o.dao.UserProductMapDao">
+    <resultMap id="baseResultMap" type="com.real.o2o.entity.UserProductMap">
+        <id column="user_product_id" property="userProductId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="point" property="point"/>
+        <association property="user" column="user_id" javaType="com.real.o2o.entity.PersonInfo">
+            <id column="user_id" property="userId"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="product" column="product_id" javaType="com.real.o2o.entity.Product">
+            <id column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+        </association>
+        <association property="shop" column="shop_id" javaType="com.real.o2o.entity.Shop">
+            <id column="shop_id" property="shopId"/>
+            <result column="shop_name" property="shopName"/>
+        </association>
+        <association property="operator" column="operator_id" javaType="com.real.o2o.entity.PersonInfo">
+            <id column="operator_id" property="userId"/>
+            <result column="operator_name" property="name"/>
+        </association>
+    </resultMap>
+
+    <select id="queryUserProductMapList" resultMap="baseResultMap">
+        select
+        u.user_product_id,
+        u.create_time,
+        u.point,
+        us.user_id,
+        us.name,
+        p.product_id,
+        p.product_name,
+        s.shop_id,
+        s.shop_name,
+        o.user_id as operator_id,
+        o.name as operator_name
+        from
+        tb_user_product_map u,
+        tb_person_info us,
+        tb_product p,
+        tb_shop s,
+        tb_person_info o
+        <where>
+            u.user_id = us.user_id and u.product_id = p.product_id and u.shop_id = s.shop_id and u.operator_id = o.user_id
+            <if test="userProductCondition.user != null and userProductCondition.user.userId != null">
+                and u.user_id = #{userProductCondition.user.userId}
+            </if>
+            <if test="userProductCondition.shop != null and userProductCondition.shop.shopId != null">
+                and u.shop_id = #{userProductCondition.shop.shopId}
+            </if>
+            <if test="userProductCondition.user != null and userProductCondition.user.name != null">
+                and us.name like concat('%','${userProductCondition.user.name}','%')
+            </if>
+            <if test="userProductCondition.product != null and userProductCondition.product.productName != null">
+                and p.product_name like concat('%','${userProductCondition.product.productName}','%')
+            </if>
+            <!--按消费日期进行查询-->
+            <if test="userProductCondition.createTime != null">
+                and u.create_time > #{userProductCondition.createTime}
+            </if>
+        </where>
+        order by
+        u.create_time desc
+        limit #{rowIndex},#{pageSize}
+    </select>
+
+    <select id="queryUserProductMapCount" parameterType="com.real.o2o.entity.UserProductMap" resultType="int">
+        select count(1)
+        from
+        tb_user_product_map u,
+        tb_person_info us,
+        tb_product p,
+        tb_shop s,
+        tb_person_info o
+        <where>
+            u.user_id = us.user_id and u.product_id = p.product_id and u.shop_id = s.shop_id and u.operator_id = o.user_id
+            <if test="userProductCondition.user != null and userProductCondition.user.userId != null">
+                and u.user_id = #{userProductCondition.user.userId}
+            </if>
+            <if test="userProductCondition.shop != null and userProductCondition.shop.shopId != null">
+                and u.shop_id = #{userProductCondition.shop.shopId}
+            </if>
+            <if test="userProductCondition.user != null and userProductCondition.user.name != null">
+                and us.name like concat('%','${userProductCondition.user.name}','%')
+            </if>
+            <if test="userProductCondition.product != null and userProductCondition.product.productName != null">
+                and p.product_name like concat('%','${userProductCondition.product.productName}','%')
+            </if>
+            <!--按消费日期进行查询-->
+            <if test="userProductCondition.createTime != null">
+                and u.create_time > #{userProductCondition.createTime}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUserProductMap" parameterType="com.real.o2o.entity.UserProductMap" keyProperty="userProductId" keyColumn="user_product_id" useGeneratedKeys="true">
+        insert into
+        tb_user_product_map(create_time,point,user_id,product_id,shop_id,operator_id)
+        values
+        (#{createTime},#{point},#{user.userId},#{product.productId},#{shop.shopId},#{operator.userId})
+    </insert>
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.real.o2o.dao.UserShopMapDao">
+    <resultMap id="baseResultMap" type="com.real.o2o.entity.UserShopMap">
+        <id column="user_shop_id" property="userShopId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="point" property="point"/>
+        <association property="user" column="user_id" javaType="com.real.o2o.entity.PersonInfo">
+            <id column="user_id" property="userId"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="shop" column="shop_id" javaType="com.real.o2o.entity.Shop">
+            <id column="shop_id" property="shopId"/>
+            <result column="shop_name" property="shopName"/>
+        </association>
+    </resultMap>
+
+    <insert id="insertUserShopMap" parameterType="com.real.o2o.entity.UserShopMap" keyColumn="user_shop_id" keyProperty="userShopId" useGeneratedKeys="true">
+        insert into tb_user_shop_map(create_time,point,user_id,shop_id)
+        values (#{createTime},#{point},#{user.userId},#{shop.shopId})
+    </insert>
+
+    <select id="queryUserShopMapList" resultMap="baseResultMap">
+        select
+        u.user_shop_id,
+        u.create_time,
+        u.point,
+        us.user_id,
+        us.name,
+        s.shop_id,
+        s.shop_name
+        from
+        tb_user_shop_map u,
+        tb_person_info us,
+        tb_shop s
+        <where>
+            u.user_id = us.user_id and u.shop_id = s.shop_id
+            <!--按照顾客信息准确查询-->
+            <if test="userShopCondition.user!=null and userShopCondition.user.userId!=null">
+                and u.user_id = #{userShopCondition.user.userId}
+            </if>
+            <!--按照店铺信息准确查询-->
+            <if test="userShopCondition.shop!=null and userShopCondition.shop.shopId!=null">
+                and u.shop_id = #{userShopCondition.shop.shopId}
+            </if>
+            <!--按照顾客姓名模糊查询-->
+            <if test="userShopCondition.user!=null and userShopCondition.user.name!=null">
+                and us.name like concat('%','${userShopCondition.user.name}','%')
+            </if>
+            <!--按照商店姓名模糊查询-->
+            <if test="userShopCondition.shop!=null and userShopCondition.shop.shopName!=null">
+                and s.name like concat('%','${userShopCondition.shop.shopName}','%')
+            </if>
+            <if test="userShopCondition.createTime!=null">
+                and create_time > #{userShopCondition.createTime}
+            </if>
+        </where>
+        limit #{rowIndex},#{pageSize};
+    </select>
+    <select id="queryUserShopMapCount" resultType="int">
+        select count(1)
+        from
+        tb_user_shop_map u,
+        tb_person_info us,
+        tb_shop s
+        <where>
+            u.user_id = us.user_id and u.shop_id = s.shop_id
+            <!--按照顾客信息准确查询-->
+            <if test="userShopCondition.user!=null and userShopCondition.user.userId!=null">
+                and u.user_id = #{userShopCondition.user.userId}
+            </if>
+            <!--按照店铺信息准确查询-->
+            <if test="userShopCondition.shop!=null and userShopCondition.shop.shopId!=null">
+                and u.shop_id = #{userShopCondition.shop.shopId}
+            </if>
+            <!--按照顾客姓名模糊查询-->
+            <if test="userShopCondition.user!=null and userShopCondition.user.name!=null">
+                and us.name like concat('%','${userShopCondition.user.name}','%')
+            </if>
+            <!--按照商店姓名模糊查询-->
+            <if test="userShopCondition.shop!=null and userShopCondition.shop.shopName!=null">
+                and s.name like concat('%','${userShopCondition.shop.shopName}','%')
+            </if>
+            <if test="userShopCondition.createTime!=null">
+                and create_time > #{userShopCondition.createTime}
+            </if>
+        </where>
+    </select>
+    <select id="queryUserShopMap" resultMap="baseResultMap" parameterType="long">
+        select
+        u.user_shop_id,
+        u.create_time,
+        u.point,
+        us.user_id,
+        us.name,
+        s.shop_id,
+        s.shop_name
+        from
+        tb_user_shop_map u,
+        tb_person_info us,
+        tb_shop s
+        where
+        u.user_id = us.user_id and u.shop_id = s.shop_id and u.user_id = #{userId} and u.shop_id = #{shopId}
+    </select>
+    <update id="updateUserShopMapPoint" parameterType="com.real.o2o.entity.UserShopMap">
+        update tb_user_shop_map
+        set point = #{point}
+        where user_id = #{user.userId} and shop_id=#{shop.shopId}
+    </update>
+</mapper>
+
+

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.real.o2o.dao.ShopAuthMapDao">
+    <resultMap id="baseResultMap" type="com.real.o2o.entity.ShopAuthMap">
+        <id column="shop_auth_id" property="shopAuthId"/>
+        <result column="title" property="title"/>
+        <result column="title_flag" property="titleFlag"/>
+        <result column="create_time" property="createTime"/>
+        <result column="last_edit_time" property="lastEditTime"/>
+        <result column="enable_status" property="enableStatus"/>
+        <association property="employee" column="employee_id" javaType="com.real.o2o.entity.PersonInfo">
+            <id column="user_id" property="userId"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="shop" column="shop_id" javaType="com.real.o2o.entity.Shop">
+            <id column="shop_id" property="shopId"/>
+            <result column="shop_name" property="shopName"/>
+        </association>
+    </resultMap>
+
+    <select id="queryShopAuthMapList" resultMap="baseResultMap">
+        select
+        sa.shop_auth_id,
+        sa.title,
+        sa.title_flag,
+        sa.create_time,
+        sa.last_edit_time,
+        sa.enable_status,
+        e.user_id,
+        e.name,
+        s.shop_id,
+        s.shop_name
+        from
+        tb_shop_auth_map sa,
+        tb_person_info e,
+        tb_shop s
+        where
+        sa.employee_id = e.user_id and sa.shop_id = s.shop_id and sa.shop_id = #{shopId}
+        limit #{rowIndex},#{pageSize}
+    </select>
+
+    <select id="queryShopAuthMapCount" resultType="int">
+        select count(1)
+        from
+        tb_shop_auth_map sa,
+        tb_person_info e,
+        tb_shop s
+        where
+        sa.employee_id = e.user_id and sa.shop_id = s.shop_id and sa.shop_id = #{shopId}
+    </select>
+
+    <select id="queryShopAuthMapById" resultMap="baseResultMap" parameterType="long">
+        select
+        sa.shop_auth_id,
+        sa.title,
+        sa.title_flag,
+        sa.create_time,
+        sa.last_edit_time,
+        sa.enable_status,
+        e.user_id,
+        e.name,
+        s.shop_id,
+        s.shop_name
+        from
+        tb_shop_auth_map sa,
+        tb_person_info e,
+        tb_shop s
+        where
+        sa.employee_id = e.user_id and sa.shop_id = s.shop_id and sa.shop_auth_id = #{shopAuthId}
+    </select>
+
+    <insert id="insertShopAuthMap" parameterType="com.real.o2o.entity.ShopAuthMap" keyProperty="shopAuthId" keyColumn="shop_auth_id" useGeneratedKeys="true">
+        insert into
+        tb_shop_auth_map(title,title_flag,create_time,last_edit_time,enable_status,employee_id,shop_id)
+        values (#{title},#{titleFlag},#{createTime},#{lastEditTime},#{enableStatus},#{employee.userId},#{shop.shopId})
+    </insert>
+
+    <update id="updateShopAuthMap" parameterType="com.real.o2o.entity.ShopAuthMap">
+        update tb_shop_auth_map
+        <set>
+            <if test="title!=null">title=#{title},</if>
+            <if test="titleFlag!=null">title_flag=#{titleFlag},</if>
+            <if test="enableStatus!=null">enable_status = #{enableStatus},</if>
+            <if test="lastEditTime!=null">last_edit_time = #{lastEditTime}</if>
+        </set>
+        where shop_auth_id = #{shopAuthId}
+    </update>
+
+    <delete id="deleteShopAuthMap" parameterType="Long">
+        delete from tb_shop_auth_map
+        where shop_auth_id=#{shopAuthId}
+    </delete>
+</mapper>
